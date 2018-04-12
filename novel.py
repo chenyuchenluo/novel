@@ -6,7 +6,7 @@ import function 	# 加载模块
 
 def getNum():
 	try:
-		num = int(input(u'请输入一个数：'))
+		num = int(input(u'请输入参数：'))
 	except Exception as e:
 		num = getNum()
 	return num
