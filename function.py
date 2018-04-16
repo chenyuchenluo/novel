@@ -408,7 +408,7 @@ def bxwx3(URL):
 
 	for string in group:
 		match = re.findall("_blank\">(.*?)</a>",string)
-		if len(match) > 0:
+		if len(match) > 0 and match[0] == Name_hanzi:
 			BaseUrl = re.findall("(.*?)\"",string)[0]
 			break
 
