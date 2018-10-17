@@ -5,6 +5,7 @@
 # \xb6\xfe\xb6\xfe\xd5\xc2 gbk编码
 # 内容解码 content.decode('gbk').encode('utf-8')
 
+import ssl 			# 证书
 import requests		# 发送网络请求
 import urllib 		# 用于urldecode
 import threading 	# 线程
@@ -25,7 +26,6 @@ from Stack import Stack # 栈
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
-
 SESSION = requests.session()
 HOME_PATH = os.path.dirname((sys.argv[0])) + os.sep
 DICTIONARY_PATH = HOME_PATH + 'Libs' + os.sep
@@ -34,16 +34,15 @@ NOVEL_INDEX_MAX = 50000
 MAX_ERROR_TIMES = 50
 
 url_hanzi_2_pinying_1 = 'http://www.qqxiuzi.cn/zh/pinyin/'
-url_hanzi_2_pinying_2 = 'http://www.qqxiuzi.cn/zh/pinyin/show.php'
+url_hanzi_2_pinying_2 = 'https://www.qqxiuzi.cn/zh/pinyin/show.php'
 
 User_Agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36'
 
 NOVEL_URLS = {
-	'cangqionglongqi'	:'http://www.cangqionglongqi.com/',
-	'biquge'			:'https://www.biqugezw.com/',
-	'booktxt'			:'http://www.booktxt.net/',
+	# 'cangqionglongqi'	:'https://www.cangqionglongqi.com/',
+	'biquge'			:'https://www.biquge.com.tw/',
+	'booktxt'			:'https://www.booktxt.net/',
 	'bxwx3'				:'http://www.bxwx3.org/',
-	# 'xuehong'			:'http://www.xuehong.cc/',
 }
 
 URL_NAMES = {
@@ -51,7 +50,6 @@ URL_NAMES = {
 	'booktxt'			:'顶点小说网',
 	'biquge'			:'笔趣阁',
 	'bxwx3'				:'笔下文学',
-	# 'xuehong'			:'血红小说网',
 }
 
 def init():
@@ -96,7 +94,7 @@ def getNextNovelName():
 		Name_hanzi = Names[NameIndex]
 		NameIndex = NameIndex + 1
 
-		print u'******** 检查 《%s》 更新 ********'%Name_hanzi
+		print(format(u' 检查 《%s》 更新 '%Name_hanzi,"*^40"))
 
 		getHanzi2Pinyi(False)
 
@@ -116,7 +114,7 @@ def getHanzi2Pinyi(only):
 
 	try:
 		response = SESSION.get(url_hanzi_2_pinying_1, headers = headers, params = {}, verify = False)
-		SECRETCODE = re.search("token=(.*?)'",response.content).group(1)
+		SECRETCODE = re.search("&token=(.*?)\'",response.content).group(1)
 	except Exception as e:
 		pass
 
@@ -126,19 +124,18 @@ def getHanzi2Pinyi(only):
 
 	headers = {
 		'Accept':'*/*',
-		'Accept-Encoding':'gzip, deflate',
+		'Accept-Encoding':'gzip, deflate, br',
 		'Accept-Language':'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
 		'Connection':'keep-alive',
 		'Content-type':'application/x-www-form-urlencoded',
 		'Host':'www.qqxiuzi.cn',
 		'Referer':'http://www.qqxiuzi.cn/zh/pinyin/',
-		'User-Agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:58.0) Gecko/20100101 Firefox/58.0'
+		'User-Agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:61.0) Gecko/20100101 Firefox/61.0'
 	}
 
 	data = {
 		'b':'null','d':'1','h':'null','k':'1','s':'null','t':Name_hanzi,'token':SECRETCODE,'u':'null','v':'null','y':'null','z':'null',
 	}
-	
 	response = SESSION.post(url = url_hanzi_2_pinying_2, data = data, headers = headers, verify = False)
 	result = re.sub(' ','',response.content)
 	Name_pinyi = re.sub('<(.*?)>','',result)
@@ -204,19 +201,21 @@ def cangqionglongqi(URL):
 
 	headers = {
 		'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-		'Accept-Encoding':'gzip, deflate',
+		'Accept-Encoding':'gzip,deflate,br',
 		'Accept-Language':'zh-CN,zh;q=0.9',
 		'Connection':'keep-alive',
+		'If-None-Match':'W/"5b450ddd-93ae"',
 		'Host':'www.cangqionglongqi.com',
 		'Upgrade-Insecure-Requests':'1',
-		'User-Agent':User_Agent,
+		'User-Agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:61.0) Gecko/20100101 Firefox/61.0',
 	}
 
-	try:
-		html = SESSION.get(BaseUrl, headers = headers, params = {}, verify = False)
-	except Exception as e:
-		cangqionglongqi(URL)
-		return
+	# try:
+	html = SESSION.get("https://www.cangqionglongqi.com/feijianwendao/", headers = headers, params = {}, verify = False)
+	print html.content
+	# except Exception as e:
+	# 	cangqionglongqi(URL)
+	# 	return
 	result = html.content.decode('gbk').encode('utf-8')
 	group = re.findall("<dd><a href=\"(.*?)</a></dd>", result)
 
@@ -286,7 +285,7 @@ def booktxt(URL):
 			'Cache-Control':'max-age=0',
 			'Connection':'keep-alive',
 			'Host':'zhannei.baidu.com',
-			'Referer':'http://www.booktxt.net/',
+			'Referer':'https://www.booktxt.net/',
 			'Upgrade-Insecure-Requests':'1',
 			'User-Agent':User_Agent,
 		}
@@ -329,10 +328,9 @@ def booktxt(URL):
 		booktxt(URL)
 		return
 	result = html.content.decode('gbk').encode('utf-8')
-
 	content = re.search("正文</dt>((.|\n)*?)</dl>",result).group()
-	group = re.findall("<dd><a href=\"/(.*?)</a></dd>",content)
-
+	group = re.findall("<dd><a href=\"(.*?)</a></dd>",content)
+	
 	chapter = open(Path_chapter,'a+')
 	content = open(Path_content,'a+')
 	curLines = len(group)
@@ -492,7 +490,7 @@ def biquge(URL):
 		'Accept-Language':'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
 		'Cache-Control':'max-age=0',
 		'Connection':'keep-alive',
-		'Host':'www.biqugezw.com',
+		'Host':'www.biquge.com.tw',
 		'Upgrade-Insecure-Requests':'1',
 		'User-Agent':User_Agent,
 	}
@@ -501,6 +499,7 @@ def biquge(URL):
 		html = SESSION.get(URL + '%d_%d/'%(math.floor(index / 1000),index), headers = headers, data = {}, verify = False)
 	except Exception as e:
 		biquge(URL)
+		return
 	result = html.content.decode('gbk').encode('utf-8')
 	group = re.findall("<dd><a href=\"/(.*?)</a></dd>",result)
 
@@ -516,14 +515,14 @@ def biquge(URL):
 				url_name = group[ChaptersNum].split('">')
 				print u'正在抓取 《%s》 %s'%(Name_hanzi,url_name[1])
 				html = SESSION.get(URL + url_name[0], headers = headers, params = {}, verify = False)
-				result = unicode(html.content,'gbk').encode('utf8')
+				result = html.content.decode('gb18030').encode('utf8')
 				result = re.sub('&nbsp;',' ',result)
 				result = re.sub('<br />','\n',result)
 				goal = re.search("content\">((.|\n)*?)</div>",result).group()
 
 				goal = re.sub('content">','',goal)
 				goal = re.sub('</div>','',goal)
-				goal = re.sub("一秒记住【笔趣阁中文网<a href=\"http://www.biqugezw.com\" target=\"_blank\">www.biqugezw.com</a>】，为您提供精彩小说阅读。",'',goal)
+				# goal = re.sub("一秒记住【笔趣阁中文网<a href=\"http://www.biqugezw.com\" target=\"_blank\">www.biqugezw.com</a>】，为您提供精彩小说阅读。",'',goal)
 				goal = re.sub("手机用户请浏览m.biqugezw.com阅读，更优质的阅读体验。",'',goal)
 				
 				goal = url_name[1] + '\n' + goal + '\n'
@@ -792,8 +791,9 @@ def biqugeLib(bFix):
 		'Accept-Language':'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
 		'Cache-Control':'max-age=0',
 		'Connection':'keep-alive',
-		'Host':'www.biqugezw.com',
+		'Host':'www.biquge.com.tw',
 		'Upgrade-Insecure-Requests':'1',
+		'Referer':'http://www.biquge.com.tw/',
 		'User-Agent':User_Agent,
 	}
 
@@ -803,7 +803,7 @@ def biqugeLib(bFix):
 	if bFix:
 		start_index = 1
 	else:
-		start_index = len(Lib_index_name)
+		start_index = max(1,len(Lib_index_name))
 	error_times = 0
 	def requests():
 		global start_index
@@ -812,11 +812,10 @@ def biqugeLib(bFix):
 			try:
 				novel_index = '%d_%d/'%(math.floor(start_index / 1000),start_index)
 				if not checkLibIndex(str(start_index)):
-					html = SESSION.get("https://www.biqugezw.com/" + novel_index, headers = headers, params = {}, verify = False)
+					html = SESSION.get("https://www.biquge.com.tw/" + novel_index, headers = headers, params = {}, verify = False)
 					result = html.content.decode('gbk').encode('utf-8')
-
 					global Name_hanzi
-					Name_hanzi = re.findall("og:title\" content=\"(.*?)\" />",result)[0]
+					Name_hanzi = re.findall("og:title\" content=\"(.*?)\"/>",result)[0]
 					if Name_hanzi != '':
 						getHanzi2Pinyi(True)
 						Lib.write(Name_hanzi + '=' + Name_pinyi + '=' + str(start_index) + '\n')
