@@ -95,8 +95,8 @@ def initHadChapters():
 	global ChaptersNum
 
 	Path_dir = HOME_PATH + os.sep + 'novels' + os.sep + Ower
-	Path_chapter = Path_dir + os.sep + Name_hanzi + '_' + 'menu.txt'
-	Path_content = Path_dir + os.sep + Name_hanzi + '.txt'
+	Path_chapter = Path_dir + os.sep + Name_hanzi.decode('utf-8') + '_' + 'menu.txt'
+	Path_content = Path_dir + os.sep + Name_hanzi.decode('utf-8') + '.txt'
 
 	if not os.path.exists(Path_dir):
 		os.makedirs(Path_dir)

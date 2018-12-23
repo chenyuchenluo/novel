@@ -3,3 +3,11 @@
 1.在第一行输入小说名，多个以=隔开
 2.查找时是按照完全匹配字符原则
 3.网络不好的时候可能会导致请求超时错误
+4.windows运行时需要将终端的字符格式设定为utf-8，操作步骤
+	打开终端
+	输入命令 chcp 65001
+5.需要安装python 2.7 版本
+6.需要安装pip，方便安装python第三方库
+	可以直接搜索下载，解压后使用终端进入文件夹使用命令安装 python setup.py install
+7.需要安装python第三方库 requests
+	pip install requests
