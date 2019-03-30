@@ -160,6 +160,7 @@ def booktxt(URL):
 		'Cache-Control':'max-age=0',
 		'Connection':'keep-alive',
 		'Host':'www.booktxt.net',
+		'TE':'Trailers',
 		'Referer':Referer,
 		'Upgrade-Insecure-Requests':'1',
 		'User-Agent':User_Agent,
