@@ -1,27 +1,59 @@
 # coding=utf-8
-# 2.7版本 字符串有两种编码格式（Unicode、utf-8） 防止输出错误
 
-import function 	# 加载模块
+from MyClass import Helper
+import Function
 
-def getNum():
-	try:
-		num = input('enter a number:')
-	except Exception as e:
-		num = getNum()
-	return num
+def UpdateNovelChapter():
+	Function.updateChapters()
 
-if __name__ == '__main__':	
-	function.init()
+def UpdateNovelLib():
+	Function.updateLib()
 
-	print('*************************')
-	print('1: update novels in menu')
-	print('2: update novels libs')
-	print('3: fixed missing chapter in libs')
-	print('*************************')
+def ResetNovelLib():
+	Function.resetLib()
 
-	index = getNum()
-	if index == 1:
-		function.start()
-	else:
-		function.checkUpdateDictionaryLib(index == 3)
+def Quit():
+	quit()
+
+def defalt():
+	Helper.printError(string = "can't find funcName")
+
+def init():
+	funcData = {
+		"1" : {"idx" : 1, "funcName" : "UpdateNovelChapter"},
+		"2" : {"idx" : 2, "funcName" : "UpdateNovelLib"},
+		"3" : {"idx" : 3, "funcName" : "ResetNovelLib"},
+		"0" : {"idx" : 0, "funcName" : "Quit"},
+	}
+
+	Helper.printLine()
+	for data in funcData.values():
+		Helper.print(string = '{}: {}'.format(data.get("idx"),data.get("funcName")))
+	Helper.printLine()
+
+
+	checkDone = False
+	while not checkDone:
+		try:
+			data = funcData.get(str(Helper.getNum()),{})
+			if data:
+				checkDone = True
+				funcName = data.get('funcName','defalt')
+				func = globals().get(funcName)
+				func()
+		except Exception as e:
+			Helper.printError()
+			raise e
+	
+
+if __name__ == '__main__':
+	# 初始化lib novel name txt文件
+	Function.init()
+	# init()
+	# 死循环
+	while True:
+		init()
+
+
+
 
