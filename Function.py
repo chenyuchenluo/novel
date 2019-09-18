@@ -36,7 +36,7 @@ URL_LIMIT = {
 	'gebiqu' : {'count':1},
 }
 
-Lib_Max_Count = 60000
+Lib_Max_Count = 80000
 Repeat_Max_Count = 10
 
 def init():
@@ -180,8 +180,6 @@ def checkBooks(libName, libUrl):
 
 
 def checkChapters(libName, libUrl, libIndex, bookName):
-	Helper.print("Check {} chapters in {}".format(bookName, libName))
-
 	fileContent = open(NOVEL_PATH + libName + os.sep + bookName + '.txt','a+', encoding = 'utf-8')
 	fileMulu = open(NOVEL_PATH + libName + os.sep + bookName + '_目录.txt','r+', encoding = 'utf-8')
 
@@ -292,16 +290,19 @@ def checkLib(libName,libUrl):
 			html = getBookChapterHtml(curIndex, libName, libUrl)
 			novelName = Html.getBookName(html)
 			if novelName and Novel_Lib.get(str(curIndex),"") != novelName:
+				ErrorCount = 0
 				Novel_Lib[str(curIndex)] = novelName
 				Lib.write(novelName + "=" + str(curIndex) + "\n")
 				Helper.print("{} add {} {}".format(libName,curIndex,novelName))
+			else:
+				ErrorCount = ErrorCount + 1
+				if ErrorCount > Repeat_Max_Count:
+					curIndex = Lib_Max_Count + 1
+					ErrorCount = 0
+
 			curIndex = curIndex + 1
 		except Exception as e:
 			Helper.printError()
-			ErrorCount = ErrorCount + 1
-			if ErrorCount > Repeat_Max_Count:
-				curIndex = curIndex + 1
-				ErrorCount = 0
 	
 		time.sleep(Helper.randomFloat())
 
