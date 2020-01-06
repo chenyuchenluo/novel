@@ -109,41 +109,48 @@ class HTML():
 
     # 获取所有的章节url ["第一章，ref=98233.html",...]
     def getChapterUrls(self, html):
-        for idx in range(1,2):
-            urls = eval('self.getChapterUrls' + str(idx) + '(html)')
-            if len(urls) > 10:
-                return urls
-        return []
+        urls = []
+        group = []
 
-    # 获取所有章节url 方法1
-    def getChapterUrls1(self, html):
+        for idx in range(2):
+            group = eval('self.getChapterUrls' + str(idx) + '(html)')
+            if len(group) > 10:
+                break
+
+        for line in group:
+            url = re.search("(\d{1}|\d{2}|\d{3}|\d{4}|\d{5}|\d{6}|\d{7}|\d{8}|).html",line).group()
+            content = re.findall(">(.*?)<",line)[0]
+            urls.append("{}={}".format(url,content))
+
+        return urls
+
+    # 获取所有章节url 方法0
+    def getChapterUrls0(self, html):
         # <dd><a href='/biquge_1/3850105.html'>番外九 相守</a></dd>
         # <dd><a href="38272.html" title="我的第四本书，欢迎大家。">我的第四本书，欢迎大家。</a></dd>
         temp = re.sub("head((.|\n)*?)正文","",html)
         group = re.findall("<dd><a href(.*?)/a></dd>",temp)
 
-        urls = []
-        for line in group:
-            url = re.search("(\d{1}|\d{2}|\d{3}|\d{4}|\d{5}|\d{6}|\d{7}|\d{8}|).html",line).group()
-            content = re.findall(">(.*?)<",line)[0]
-            urls.append("{}={}".format(url,content))
-        return urls
+        return group
 
-    # 获取所有章节url 方法2
-    def getChapterUrls2(self, html):
-        urls = []
-        return urls
+    # 获取所有章节url 方法1
+    def getChapterUrls1(self, html):
+        # <dd> <a style="" href="/0_11/4981880.html">第四千六百三十五章 大衍域</a></dd>
+        temp = re.sub("<body>((.|\n)*?)正文","",html)
+        group = re.findall("<dd> <a style(.*?)/a></dd>",temp)
+
+        return group
 
     # 获取章节内容
     def getChapterContent(self, html):
-        for idx in range(1,2):
+        for idx in range(2):
             content = eval('self.getChapterContent' + str(idx) + '(html)')
             if content and content != "" :
                 return content
         return ""
 
-    # 获取章节内容，解析方法1
-    def getChapterContent1(self, html):
+    # 获取章节内容，解析方法0
+    def getChapterContent0(self, html):
         # <div id="content">CONTENT</div>
         html = re.sub(r"\r\n","",html)
         html = re.sub("<!(.*?)>","",html)
@@ -158,8 +165,8 @@ class HTML():
 
         return ""
 
-    # 获取章节内容，解析方法2
-    def getChapterContent2(self, html):
+    # 获取章节内容，解析方法1
+    def getChapterContent1(self, html):
         return ""
 
 

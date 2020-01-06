@@ -26,17 +26,17 @@ NOVEL_LIB_PATH = HOME_PATH + 'Libs' + os.sep
 User_Agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.132 Safari/537.36'
 
 URLS = {
-	'1':{'name':'biquke', 'url':'https://www.biquke.com/bq/{}/{}/'},
+	'1':{'name':'biquge', 'url':'https://www.biquge.tw/{}_{}/'},
 	'2':{'name':'gebiqu', 'url':'https://www.gebiqu.com/biquge_{}/'},
 }
 
 URL_LIMIT = {
 	# count url中参数个数
-	'biquke' : {'count':2},
+	'biquge' : {'count':2},
 	'gebiqu' : {'count':1},
 }
 
-Lib_Max_Count = 80000
+Lib_Max_Count = 90000
 Repeat_Max_Count = 10
 
 def init():
@@ -254,6 +254,7 @@ def getChapterHtml(libName, libUrl, libIndex, chapterIdx):
 			html = SESSION.get(url + chapterIdx, headers = headers, params = {}, verify = False, timeout = 3)
 			questTimes = 5
 		except Exception as e:
+			Helper.printError(string = "request {} again".format(libIndex))
 			questTimes = questTimes + 1
 			time.sleep(Helper.randomFloat())
 
@@ -295,6 +296,7 @@ def checkLib(libName,libUrl):
 				Lib.write(novelName + "=" + str(curIndex) + "\n")
 				Helper.print("{} add {} {}".format(libName,curIndex,novelName))
 			else:
+				Helper.printError(string = "request {} again".format(novelName))
 				ErrorCount = ErrorCount + 1
 				if ErrorCount > Repeat_Max_Count:
 					curIndex = Lib_Max_Count + 1
