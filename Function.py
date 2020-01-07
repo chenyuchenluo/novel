@@ -296,7 +296,7 @@ def checkLib(libName,libUrl):
 				Lib.write(novelName + "=" + str(curIndex) + "\n")
 				Helper.print("{} add {} {}".format(libName,curIndex,novelName))
 			else:
-				Helper.printError(string = "request {} again".format(novelName))
+				Helper.printError(string = "request {} error".format(curIndex))
 				ErrorCount = ErrorCount + 1
 				if ErrorCount > Repeat_Max_Count:
 					curIndex = Lib_Max_Count + 1
