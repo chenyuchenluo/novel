@@ -37,7 +37,7 @@ URL_LIMIT = {
 }
 
 Lib_Max_Count = 90000
-Repeat_Max_Count = 10
+Repeat_Max_Count = 2
 
 def init():
 	novels = open(HOME_PATH + 'name.txt','a+', encoding = 'utf-8')
@@ -206,12 +206,10 @@ def checkChapters(libName, libUrl, libIndex, bookName):
 				try:
 					url_name = chapterUrls[curIdx]
 					values = re.split("=",url_name)
-					chapter = values[1]
+					chapter = Helper.formatChapterName(values[1])
 					html = getChapterHtml(libName,libUrl,libIndex,values[0])
 					content = Html.getChapterContent(html)
 
-					if content == "":
-						content = chapter
 					fileContent.write(chapter + "\n" + content + "\n")
 					fileMulu.write(chapter + "\n")
 					Helper.print("{} {}".format(bookName,chapter))
@@ -290,19 +288,21 @@ def checkLib(libName,libUrl):
 		try:
 			html = getBookChapterHtml(curIndex, libName, libUrl)
 			novelName = Html.getBookName(html)
-			if novelName and Novel_Lib.get(str(curIndex),"") != novelName:
-				ErrorCount = 0
-				Novel_Lib[str(curIndex)] = novelName
-				Lib.write(novelName + "=" + str(curIndex) + "\n")
-				Helper.print("{} add {} {}".format(libName,curIndex,novelName))
+			if novelName:
+				if Novel_Lib.get(str(curIndex),"") != novelName:
+					ErrorCount = 0
+					Novel_Lib[str(curIndex)] = novelName
+					Lib.write(novelName + "=" + str(curIndex) + "\n")
+					Helper.print("{} add {} {}".format(libName,curIndex,novelName))
+				else:
+					curIndex = curIndex + 1
 			else:
 				Helper.printError(string = "request {} error".format(curIndex))
 				ErrorCount = ErrorCount + 1
-				if ErrorCount > Repeat_Max_Count:
-					curIndex = Lib_Max_Count + 1
+				if ErrorCount >= Repeat_Max_Count:
+					curIndex = curIndex + 1
 					ErrorCount = 0
 
-			curIndex = curIndex + 1
 		except Exception as e:
 			Helper.printError()
 	
@@ -320,126 +320,5 @@ def resetLib():
 		lib = open(NOVEL_LIB_PATH + data['name'] + '.txt','w')
 		lib.close()
 	Helper.print("reset lib done")
-
-# >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

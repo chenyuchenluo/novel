@@ -4,6 +4,18 @@ import math
 import re
 import random
 
+COMMON_DEFINE_1 = {
+    '零':0,'一':1,'二':2,'三':3,'四':4,
+    '五':5,'六':6,'七':7,'八':8,'九':9,
+    '十':10,'百':100,'千':1000,'万':10000
+}
+
+COMMON_DEFINE_2 = {
+    '0':'零','1':'一','2':'二','3':'三','4':'四',
+    '5':'五','6':'六','7':'七','8':'八','9':'九',
+    '10':'十','100':'百','1000':'千','10000':'万'
+}
+
 # Helper方法不用过类实例调用，所有自定义方法时不用传self
 class Helper():
 
@@ -38,14 +50,8 @@ class Helper():
 
     # 数字转换成大写
     def numToId(num):
-        desc = {
-            '0':'零','1':'一','2':'二','3':'三','4':'四',
-            '5':'五','6':'六','7':'七','8':'八','9':'九',
-            '10':'十','100':'百','1000':'千','10000':'万'
-        }
-
         if not num:
-            return desc.get('0','0')
+            return COMMON_DEFINE_2.get('0','0')
 
         array = []
         while num > 0:
@@ -58,16 +64,44 @@ class Helper():
             value = array[idx]
             if value == 0 :
                 if array[idx - 1] != 0:
-                    result.append(desc.get('0',''))
+                    result.append(COMMON_DEFINE_2.get('0',''))
             else:
-                result.append(desc.get(str(value),''))
+                result.append(COMMON_DEFINE_2.get(str(value),''))
                 temp = 1
                 for x in range(1,len(array) - idx):
                     temp = temp * 10
                 if temp > 1:
-                    result.append(desc.get(str(temp),''))
+                    result.append(COMMON_DEFINE_2.get(str(temp),''))
         
         return "".join(result)
+
+    # 大写转换成数字
+    def idToNum(string):
+        if not string:
+            return 0
+
+        num = 0
+        temp = 0
+        for x in string:
+            if x == ' ':
+                return num + temp
+
+            value = COMMON_DEFINE_1.get(x,0)
+            if value < 10:
+                temp = value
+            else:
+                num = num + temp * value
+                temp = 0
+
+        return num + temp
+
+    # 判断章节名字格式  第xxx章 xxxx
+    def formatChapterName(name):
+        string = re.findall("第(.*?)",name)
+        if not string:
+            return "第" + name
+        else:
+            return name
 
     # 网页内容解码
     def decodeHtml(html):
@@ -147,7 +181,7 @@ class HTML():
             content = eval('self.getChapterContent' + str(idx) + '(html)')
             if content and content != "" :
                 return content
-        return ""
+        return "无法解析章节内容"
 
     # 获取章节内容，解析方法0
     def getChapterContent0(self, html):
